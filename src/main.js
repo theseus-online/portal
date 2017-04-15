@@ -5,10 +5,11 @@ import App from './app.vue';
 import router from './router';
 import iView from 'iview';
 import 'iview/dist/styles/iview.css'
+import locale from 'iview/src/locale/lang/en-US';
 
-Vue.use(iView)
-Vue.use(VueRouter)
-Vue.use(VueResource)
+Vue.use(iView, { locale });
+Vue.use(VueRouter);
+Vue.use(VueResource);
 
 Vue.http.options.root = '/proxy';
 

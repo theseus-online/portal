@@ -1,27 +1,36 @@
 <template>
     <div>
-    <Row>
-        <Col span="12">col-12</Col>
-        <Col span="12">col-12</Col>
-    </Row>
-    <br>
-    <Row>
-        <Col span="8">col-8</Col>
-        <Col span="8">col-8</Col>
-        <Col span="8">col-8</Col>
-    </Row>
-    <br>
-    <Row>
-        <Col span="6">col-6</Col>
-        <Col span="6">col-6</Col>
-        <Col span="6">col-6</Col>
-        <Col span="6">col-6</Col>
-    </Row>
+        <Affix @on-change="onAffix"><header-bar :user="userinfo"></header-bar></Affix>
+        <header-bar :user="userinfo" v-if="showFakeBar" style="z-index: -1;"></header-bar>
+        <router-view></router-view>
+        <footer-bar></footer-bar>
     </div>
 </template>
 
 <script>
-    export default {
+    import HeaderBar from './components/header.vue';
+    import FooterBar from './components/footer.vue';
 
+    export default {
+        data: function() {
+            return {
+                userinfo: null,
+                showFakeBar: false,
+            }
+        },
+        mounted: function() {
+            this.$http.get('myself').then(response => {
+                this.userinfo = response.data;
+            }, response => {});
+        },
+        components: {
+            headerBar: HeaderBar,
+            footerBar: FooterBar
+        },
+        methods: {
+            onAffix: function() {
+                this.showFakeBar = true;
+            }
+        }
     }
 </script>
