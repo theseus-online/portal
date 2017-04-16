@@ -1,12 +1,12 @@
 <template>
     <Row>
         <Col span="16" offset="4">
-            <Collapse v-if="deployments">
+            <Collapse v-if="deployments" accordion>
                 <Panel v-for="dep in deployments" :key="dep.name">
                     {{dep.name}}
                     <div slot="content">
                         <Alert>This app contains {{dep.containers.length}} containers:</Alert>
-                        <Collapse>
+                        <Collapse accordion>
                             <Panel v-for="c in dep.containers" :key="c.name">
                                 {{c.name}}
                                 <Alert type="warning" slot="content">{{c.image}}</Alert>

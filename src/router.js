@@ -1,9 +1,13 @@
 import VueRouter from 'vue-router';
 import Wip from './components/wip.vue';
+import Test from './components/test.vue';
 import User from './components/user.vue';
 import Deployment from './components/deployment.vue';
 import NewDeployment from './components/new-deployment.vue';
 import DelDeployment from './components/del-deployment.vue';
+import Service from './components/service.vue';
+import NewService from './components/new-service.vue';
+import DelService from './components/del-service.vue';
 
 export default new VueRouter({
     routes: [
@@ -35,7 +39,7 @@ export default new VueRouter({
                  {
                      name: "service",
                      path: "services",
-                     component: Wip,
+                     component: Service,
                  },
                  {
                      name: "ingress",
@@ -55,7 +59,7 @@ export default new VueRouter({
                  {
                      name: "new-service",
                      path: "new-service",
-                     component: Wip,
+                     component: NewService,
                  },
                  {
                      name: "new-ingress",
@@ -64,9 +68,14 @@ export default new VueRouter({
                  },
                  {
                      name: "del-deployment",
-                     path: ":depname/delete",
-                     component: DelDeployment,
-                 }
+                     path: "deployments/:depname/delete",
+                     component: Wip,
+                 },
+                 {
+                     name: "del-service",
+                     path: "services/:svcname/delete",
+                     component: DelService,
+                 },
              ]
          }
     ]

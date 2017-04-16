@@ -10,7 +10,7 @@
                     <Input v-model="depname" placeholder="Input the app's name"></Input>
                 </Form-item>
                 <Form-item>
-                    <Button @click="confirm" type="ghost" style="color: #ff3300;" :disabled="!confirmed">I Know What I'm Doing</Button>
+                    <Button @click="confirm" type="ghost" :disabled="!confirmed">I Know What I'm Doing</Button>
                     <Button @click="cancel" type="ghost" style="color: #00cc66;">I Regret</Button>
                 </Form-item>
             </Form>

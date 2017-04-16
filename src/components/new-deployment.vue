@@ -5,7 +5,7 @@
                 <Form-item label="App">
                     <Input v-model="newbee.name" placeholder="App Name"></Input>
                 </Form-item>
-                <Form-item v-for="(c, i) in newbee.containers" :key="i" label="Image">
+                <Form-item v-for="(c, i) in newbee.containers" :key="i" :label="'Image' + (i + 1)">
                     <Row type="flex" justify="space-between">
                         <Col span="10"><Input v-model="c.name" placeholder="Image Name"></Input></Col>
                         <Col span="10"><Input v-model="c.image" placeholder="Image Address"></Input></Col>
@@ -28,6 +28,8 @@
                 <Form-item>
                     <Tooltip content="Commit this deployment" placement="bottom">
                         <Button type="ghost" @click="deploy">Deploy</Button>
+                    </Tooltip>
+                    <Tooltip content="Cancel and go back" placement="bottom">
                         <Button type="ghost" @click="cancel">Cancel</Button>
                     </Tooltip>
                 </Form-item>
