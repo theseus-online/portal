@@ -14,6 +14,10 @@
                     <Icon type="social-rss-outline"></Icon>
                     Ingress
                 </Menu-item>
+                <Menu-item name="volume">
+                    <Icon type="social-dropbox-outline"></Icon>
+                    Volume
+                </Menu-item>
             </Menu>
         </Col>
         <Col span="18" style="margin-top: 20px;">

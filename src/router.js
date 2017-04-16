@@ -11,6 +11,9 @@ import DelService from './components/del-service.vue';
 import Ingress from './components/ingress.vue';
 import NewIngress from './components/new-ingress.vue';
 import DelIngress from './components/del-ingress.vue';
+import Volume from './components/volume.vue';
+import NewVolume from './components/new-volume.vue';
+import DelVolume from './components/del-volume.vue';
 
 export default new VueRouter({
     routes: [
@@ -52,7 +55,7 @@ export default new VueRouter({
                  {
                      name: "volume",
                      path: "volumes",
-                     component: Wip,
+                     component: Volume,
                  },
                  {
                      name: "new-deployment",
@@ -70,6 +73,11 @@ export default new VueRouter({
                      component: NewIngress,
                  },
                  {
+                     name: "new-volume",
+                     path: "new-volume",
+                     component: NewVolume,
+                 },
+                 {
                      name: "del-deployment",
                      path: "deployments/:depname/delete",
                      component: Wip,
@@ -83,6 +91,11 @@ export default new VueRouter({
                      name: "del-ingress",
                      path: "ingresses/:ingname/delete",
                      component: DelIngress,
+                 },
+                 {
+                     name: "del-volume",
+                     path: "volumes/:vname/delete",
+                     component: DelVolume,
                  },
              ]
          }
