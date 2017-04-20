@@ -80,7 +80,7 @@ export default new VueRouter({
                  {
                      name: "del-deployment",
                      path: "deployments/:depname/delete",
-                     component: Wip,
+                     component: DelDeployment,
                  },
                  {
                      name: "del-service",
