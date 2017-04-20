@@ -7,7 +7,7 @@
                 </Form-item>
                 <Form-item>
                     <Tooltip content="Commit this volume" placement="bottom">
-                        <Button type="ghost" @click="commit">Commit</Button>
+                        <Button type="ghost" @click="commit" :disabled="!commitable">Commit</Button>
                     </Tooltip>
                     <Tooltip content="Cancel and go back" placement="bottom">
                         <Button type="ghost" @click="cancel">Cancel</Button>
@@ -23,7 +23,7 @@
         data: function() {
             return {
                 newbee: {           // New deployment
-                    name: null,
+                    name: '',
                     owner: this.$route.params.username,
                 }
             }
@@ -39,6 +39,11 @@
             },
             cancel() {
                 this.$router.push({ name: "volume" });
+            }
+        },
+        computed: {
+            commitable() {
+                return !this.newbee.name.startsWith("empty-dir");
             }
         }
     }

@@ -20,9 +20,12 @@
                     <Row  type="flex" justify="space-between" v-for="(v, i) in c.volumes" :key="i" :label="'Volume' + (i + 1)">
                         <Col span="10"><Input v-model="v.mountPath" placeholder="Set mouint point(eg. /path/data)"></Input></Col>
                         <Col span="10">
-                            <Select v-model="v.name" placeholder="Chose Volume">
+                            <Select v-model="v.name" placeholder="Chose Volume" @on-change="checkVolume(v)">
                                 <Option key="" value="empty-dir">
-                                    EmptyDir
+                                    <span style="color: red">Create A New Empty Directory</span>
+                                </Option>
+                                <Option v-for="vo in emptydirs" :key="vo.name" :value="vo.name">
+                                    {{vo.name}}
                                 </Option>
                                 <Option v-for="vo in volumes" :key="vo.name" :value="vo.name">
                                     {{vo.name}}
@@ -81,7 +84,9 @@
                             volumes: []
                         }
                     ]
-                }
+                },
+                volumes: [],
+                emptydirs: []
             }
         },
         mounted: function() {
@@ -97,6 +102,22 @@
             }
         },
         methods: {
+            guid() {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+            },
+            checkVolume(v) {
+                if(v.name == "empty-dir") {
+                    let ndir = {
+                        name: "empty-dir-" + this.guid(),
+                        owner: this.$route.params.username
+                    }
+                    this.emptydirs.push(ndir);
+                    v.name = ndir.name;
+                }
+            },
             addVolume(c) {
                 c.volumes.push({
                     name: null,
