@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router';
 import Wip from './components/wip.vue';
 import Test from './components/test.vue';
+import Home from './components/home.vue';
 import User from './components/user.vue';
 import Deployment from './components/deployment.vue';
 import NewDeployment from './components/new-deployment.vue';
@@ -20,7 +21,7 @@ export default new VueRouter({
         {
             name: 'home',
             path: '/',
-            component: Wip,
+            component: Home,
         },
         {
             name: 'tutorial',
