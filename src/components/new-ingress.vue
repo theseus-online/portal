@@ -24,7 +24,7 @@
                         <Col span="11">
                             <Select v-model="newbee.servicePort" placeholder="Chose Service Port">
                                 <Option v-for="p in ports" :key="p.name" :value="p.port" :label="p.name + '(' + p.port + ')'">
-                                    <span>{{p.name}}</span>
+                                    <span class="fixed-text-span">{{p.name}}</span>
                                     <span style="float:right;color:#ccc;">{{p.port}}</span>
                                 </Option>
                             </Select>
@@ -97,3 +97,13 @@
         }
     }
 </script>
+
+<style scoped>
+    .fixed-text-span {
+        display: inline-block;
+        width: 85%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>

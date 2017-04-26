@@ -6,8 +6,6 @@
                     {{ing.name}}
                     <span style="float: right; margin-right: 20px;">
                         <span v-if="ing.secure">https</span><span v-else>http</span>:{{ing.host}}
-                        ->
-                        {{ing.serviceName}}.{{ing.owner}}:{{ing.servicePort}}
                     </span>
                     <div slot="content">
                         <Alert>
