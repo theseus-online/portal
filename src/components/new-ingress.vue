@@ -45,11 +45,13 @@
 </template>
 
 <script>
+    import uuid from 'uuid/v4';
+
     export default {
         data: function() {
             return {
                 newbee: {           // New deployment
-                    name: null,
+                    name: 'ingress-' + uuid(),
                     owner: this.$route.params.username,
                     host: null,
                     secure: false,

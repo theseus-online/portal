@@ -71,15 +71,17 @@
 </template>
 
 <script>
+    import uuid from 'uuid/v4';
+
     export default {
         data: function() {
             return {
                 newbee: {           // New deployment
-                    name: null,
+                    name: 'deployment-' + uuid(),
                     owner: this.$route.params.username,
                     containers: [
                         {
-                            name: null,
+                            name: 'container-' + uuid(),
                             image: null,
                             volumes: []
                         }
@@ -102,16 +104,10 @@
             }
         },
         methods: {
-            guid() {
-                function s4() {
-                    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-                }
-                return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-            },
             checkVolume(v) {
-                if(v.name == "empty-dir") {
+                if(v.name == 'empty-dir') {
                     let ndir = {
-                        name: "empty-dir-" + this.guid(),
+                        name: 'empty-dir-' + uuid(),
                         owner: this.$route.params.username
                     }
                     this.emptydirs.push(ndir);
@@ -129,7 +125,7 @@
             },
             addContainer() {
                 this.newbee.containers.push({
-                    name: null,
+                    name: 'container-' + uuid(),
                     image: null,
                     volumes: []
                 });

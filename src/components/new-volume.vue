@@ -19,11 +19,13 @@
 </template>
 
 <script>
+    import uuid from 'uuid/v4';
+
     export default {
         data: function() {
             return {
                 newbee: {           // New deployment
-                    name: '',
+                    name: "volume-" + uuid(),
                     owner: this.$route.params.username,
                 }
             }
