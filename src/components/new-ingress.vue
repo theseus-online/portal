@@ -3,7 +3,9 @@
         <Col span="16" offset="4">
             <Form :model="newbee" :label-width="80">
                 <Form-item label="Name">
-                    <Input v-model="newbee.name" placeholder="Ingress Name"></Input>
+                    <Input v-model="newbee.name" placeholder="Ingress Name"
+                        @on-focus="newbee.name=''" @on-blur="validateIngressName(newbee)">
+                    </Input>
                 </Form-item>
                 <Form-item label="Domain">
                     <Input v-model="newbee.host" placeholder="Your Site Domain"></Input>
@@ -33,7 +35,7 @@
                 </Form-item>
                 <Form-item>
                     <Tooltip content="Commit this ingress" placement="bottom">
-                        <Button type="ghost" @click="deploy">Deploy</Button>
+                        <Button type="ghost" @click="deploy" :disabled="!commitable">Deploy</Button>
                     </Tooltip>
                     <Tooltip content="Cancel and go back" placement="bottom">
                         <Button type="ghost" @click="cancel">Cancel</Button>
@@ -58,7 +60,8 @@
                     serviceName: '',
                     servicePort: ''
                 },
-                services: []
+                services: [],
+                ingresses: []
             }
         },
         mounted: function() {
@@ -66,6 +69,9 @@
                 this.services = response.data;
             }, response => {
                 this.$Message.error('Load services failed!');
+            });
+            this.$http.get('users/' + this.$route.params.username + '/ingresses').then(response => {
+                this.ingresses = response.data;
             });
         },
         computed: {
@@ -80,10 +86,48 @@
                     }
                 }
                 return [];
+            },
+            commitable() {
+                if(!this.newbee.host) {
+                    return false;
+                }
+                if(!this.newbee.serviceName) {
+                    return false;
+                }
+                if(!this.newbee.servicePort) {
+                    return false;
+                }
+                return true;
             }
         },
         methods: {
+            validateIngressName(ing) {
+                let name = 'ingress-' + uuid();
+                if(!ing.name) {
+                    ing.name = name;
+                }
+                for(let i of this.ingresses) {
+                    if(i.name == ing.name) {
+                        this.$Notice.warning({
+                            title: 'Conflict Ingress Name',
+                            desc: 'ingress name ' + ing.name + ' conflict with existed ingress, it was reset to ' + name,
+                            duration: 0
+                        });
+                        ing.name = name;
+                    }
+                }
+            },
             deploy() {
+                let domain_regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+                if(!domain_regex.test(this.newbee.host)) {
+                    this.$Notice.error({
+                        title: 'Error Domain Format',
+                        desc: 'domain ' + this.newbee.host + ' is invalid, valid example: example.com',
+                        duration: 0
+                    });
+                    return;
+                }
+
                 this.$http.post('users/' + this.$route.params.username + '/ingresses', this.newbee).then(response => {
                     this.$Message.success('Deploy success!');
                     this.$router.push({ name: "ingress" });

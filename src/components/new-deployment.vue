@@ -3,22 +3,34 @@
         <Col span="16" offset="4">
             <Form :model="newbee" :label-width="80">
                 <Form-item label="App">
-                    <Input v-model="newbee.name" placeholder="App Name"></Input>
+                    <Input v-model="newbee.name" placeholder="App Name"
+                          @on-focus="newbee.name=''" @on-blur="validateAppName(newbee)">
+                    </Input>
                 </Form-item>
                 <Form-item v-for="(c, i) in newbee.containers" :key="i" :label="'Image' + (i + 1)">
-                    <Row type="flex" justify="space-between">
-                        <Col span="10"><Input v-model="c.name" placeholder="Image Name"></Input></Col>
+                    <Row type="flex" justify="space-between" style="margin-top: 7px; margin-bottom: 7px;">
+                        <Col span="10">
+                            <Input v-model="c.name" placeholder="Image Name"
+                                   @on-focus="c.name=''" @on-blur="validateContainerName(c)">
+                            </Input>
+                        </Col>
                         <Col span="10"><Input v-model="c.image" placeholder="Image Address"></Input></Col>
                         <Col span="3">
                             <Tooltip content="Remove this image" placement="bottom" style="float: right;">
-                                <Button type="ghost" style="color: #ff3300;" @click="removeContainer(i)" :disabled="!canRemoveContainer">
+                                <Button type="ghost" style="color: #ff3300;"
+                                    @click="removeContainer(i)" :disabled="!canRemoveContainer">
                                     <Icon type="minus-round"></Icon>
                                 </Button>
                             </Tooltip>
                         </Col>
                     </Row>
-                    <Row  type="flex" justify="space-between" v-for="(v, i) in c.volumes" :key="i" :label="'Volume' + (i + 1)">
-                        <Col span="10"><Input v-model="v.mountPath" placeholder="Set mouint point(eg. /path/data)"></Input></Col>
+                    <Row  type="flex" justify="space-between" v-for="(v, i) in c.volumes"
+                        :key="i" :label="'Volume' + (i + 1)" style="margin-top: 7px; margin-bottom: 7px;">
+                        <Col span="10">
+                            <Input v-model="v.mountPath" @on-blur="validateMountPath(c, v)"
+                                placeholder="Set mouint point(eg. /path/data)">
+                            </Input>
+                        </Col>
                         <Col span="10">
                             <Select v-model="v.name" placeholder="Chose Volume" @on-change="checkVolume(v)">
                                 <Option key="" value="empty-dir">
@@ -35,7 +47,7 @@
                         <Col span="3">
                             <Tooltip content="Remove this volume" placement="bottom" style="float: right;">
                                 <Button type="ghost" style="color: #ff3300;" @click="removeVolume(c, i)">
-                                    <Icon type="minus-round"></Icon>
+                                    <Icon type="trash-a"></Icon>
                                 </Button>
                             </Tooltip>
                         </Col>
@@ -59,7 +71,7 @@
                 </Form-item>
                 <Form-item>
                     <Tooltip content="Commit this deployment" placement="bottom">
-                        <Button type="ghost" @click="deploy">Deploy</Button>
+                        <Button type="ghost" @click="deploy" :disabled="!commitable">Deploy</Button>
                     </Tooltip>
                     <Tooltip content="Cancel and go back" placement="bottom">
                         <Button type="ghost" @click="cancel">Cancel</Button>
@@ -88,6 +100,7 @@
                     ]
                 },
                 volumes: [],
+                deployments: [],
                 emptydirs: []
             }
         },
@@ -97,13 +110,89 @@
             }, response => {
                 this.$Message.error('Load volumes failed!');
             });
+            this.$http.get('users/' + this.$route.params.username + '/deployments').then(response => {
+                this.deployments = response.data;
+            });
         },
         computed: {
             canRemoveContainer: function() {
                 return this.newbee.containers.length > 1;
+            },
+            commitable: function() {
+                for(let c of this.newbee.containers) {
+                    if(!c.image) {
+                        return false;
+                    }
+                    for(let v of c.volumes) {
+                        if(!v.name || !v.mountPath) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             }
         },
         methods: {
+            validateAppName(app) {
+                let name = 'deployment-' + uuid();
+                if(!app.name) {
+                    app.name = name;
+                }
+                for(let d of this.deployments) {
+                    if(d.name == app.name) {
+                        this.$Notice.warning({
+                            title: 'Conflict App Name',
+                            desc: 'app name ' + app.name + ' conflict with existed deployment, it was reset to ' + name,
+                            duration: 0
+                        });
+                        app.name = name;
+                    }
+                }
+            },
+            validateContainerName(cont) {
+                let name = 'container-' + uuid();
+                let count = 0;
+                if(!cont.name) {
+                    cont.name = name;
+                    return;
+                }
+                for(let c of this.newbee.containers) {
+                    if(c.name == cont.name) {
+                        count++;
+                        if(count > 1) {
+                            this.$Notice.warning({
+                                title: 'Conflict Container Name',
+                                desc: 'more than one container named ' + cont.name + ', the latter was reset to ' + name,
+                                duration: 0
+                            });
+                            cont.name = name;
+                        }
+                    }
+                }
+            },
+            validateMountPath(cont, volume) {
+                let count = 0;
+                if(!volume.mountPath) {
+                    return;
+                }
+                for(let v of cont.volumes) {
+                    if(v.mountPath == volume.mountPath) {
+                        count++;
+                        if(count > 1) {
+                            this.$Notice.warning({
+                                title: 'Conflict Mount Path',
+                                desc: 'more than one volume mount on path ' +
+                                      volume.mountPath +
+                                      ' in container ' +
+                                      cont.name +
+                                      ', the latter was reset to empty',
+                                duration: 0
+                            });
+                            volume.mountPath = '';
+                        }
+                    }
+                }
+            },
             checkVolume(v) {
                 if(v.name == 'empty-dir') {
                     let ndir = {
@@ -134,6 +223,27 @@
                 this.newbee.containers.splice(i, 1);
             },
             deploy() {
+                let app_name_regex = /^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$/;
+                let image_name_regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+                if(!app_name_regex.test(this.newbee.name)) {
+                    this.$Notice.error({
+                        title: 'Error App Name',
+                        desc: 'app name ' + this.newbee.name + ' is invalid, valid example: MyApp, my_app, 12345',
+                        duration: 0
+                    });
+                    return;
+                }
+                for(let c of this.newbee.containers) {
+                    if(!image_name_regex.test(c.name)) {
+                        this.$Notice.error({
+                            title: 'Error Image Name',
+                            desc: 'image name ' + c.name + ' is invalid, valid example: my-name, 123-abc',
+                            duration: 0
+                        });
+                        return;
+                    }
+                }
+
                 this.$http.post('users/' + this.$route.params.username + '/deployments', this.newbee).then(response => {
                     this.$Message.success('Deploy success!');
                     this.$router.push({ name: "deployment" });

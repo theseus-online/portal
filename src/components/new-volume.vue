@@ -3,7 +3,9 @@
         <Col span="16" offset="4">
             <Form :model="newbee" :label-width="80">
                 <Form-item label="Name">
-                    <Input v-model="newbee.name" placeholder="Volume Name"></Input>
+                    <Input v-model="newbee.name" placeholder="Volume Name"
+                        @on-focus="newbee.name=''" @on-blur="validateVolumeName(newbee)">
+                    </Input>
                 </Form-item>
                 <Form-item>
                     <Tooltip content="Commit this volume" placement="bottom">
@@ -27,10 +29,27 @@
                 newbee: {           // New deployment
                     name: "volume-" + uuid(),
                     owner: this.$route.params.username,
-                }
+                },
+                volumes: []
             }
         },
         methods: {
+            validateVolumeName(volume) {
+                let name = 'volume-' + uuid();
+                if(!volume.name) {
+                    volume.name = name;
+                }
+                for(let v of this.volumes) {
+                    if(v.name == volume.name) {
+                        this.$Notice.warning({
+                            title: 'Conflict Volume Name',
+                            desc: 'volume name ' + volume.name + ' conflict with existed volume, it was reset to ' + name,
+                            duration: 0
+                        });
+                        volume.name = name;
+                    }
+                }
+            },
             commit() {
                 this.$http.post('users/' + this.$route.params.username + '/volumes', this.newbee).then(response => {
                     this.$Message.success('Add success!');
@@ -47,6 +66,11 @@
             commitable() {
                 return !this.newbee.name.startsWith("empty-dir");
             }
+        },
+        mounted: function() {
+            this.$http.get('users/' + this.$route.params.username + '/volumes').then(response => {
+                this.volumes = response.data;
+            });
         }
     }
 </script>
