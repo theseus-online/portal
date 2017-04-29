@@ -118,8 +118,17 @@
                 }
             },
             deploy() {
-                let domain_regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-                if(!domain_regex.test(this.newbee.host)) {
+                let ingress_name_regex = /^([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/
+                let domain_name_regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+                if(!ingress_name_regex.test(this.newbee.name)) {
+                    this.$Notice.error({
+                        title: 'Error Ingress Name',
+                        desc: 'ingress name ' + this.newbee.name + ' is invalid, valid example: ingress, example.com',
+                        duration: 0
+                    });
+                    return;
+                }
+                if(!domain_name_regex.test(this.newbee.host)) {
                     this.$Notice.error({
                         title: 'Error Domain Format',
                         desc: 'domain ' + this.newbee.host + ' is invalid, valid example: example.com',
