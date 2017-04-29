@@ -51,6 +51,16 @@
                 }
             },
             commit() {
+                let name_regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+                if(!name_regex.test(this.newbee.name)) {
+                    this.$Notice.error({
+                        title: 'Error Volume Name',
+                        desc: 'volume name ' + this.newbee.name + ' is invalid, valid example: my-volume, 123-volume',
+                        duration: 0
+                    });
+                    return;
+                }
+
                 this.$http.post('users/' + this.$route.params.username + '/volumes', this.newbee).then(response => {
                     this.$Message.success('Add success!');
                     this.$router.push({ name: "volume" });
