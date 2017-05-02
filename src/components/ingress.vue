@@ -15,7 +15,7 @@
                             <strong>{{ing.serviceName}}.{{ing.owner}}:{{ing.servicePort}}</strong>
                         </Alert>
                         <Alert type="warning">
-                            <Button type="ghost" shape="circle" style="color: #ff3300;" @click="deleteIngress(ing)">
+                            <Button type="ghost" shape="circle" @click="deleteIngress(ing)">
                                 Delete This Ingress
                             </Button>
                         </Alert>

@@ -37,7 +37,7 @@
                             </Col>
                         </Row>
                         <Alert type="warning">
-                            <Button type="ghost" shape="circle" style="color: #ff3300;" @click="deleteVolume(v)">
+                            <Button type="ghost" shape="circle" @click="deleteVolume(v)">
                                 Delete This Volume
                             </Button>
                         </Alert>

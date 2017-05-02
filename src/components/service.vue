@@ -13,7 +13,7 @@
                             </Panel>
                         </Collapse>
                         <Alert type="warning">
-                            <Button type="ghost" shape="circle" style="color: #ff3300;" @click="deleteService(svc)">
+                            <Button type="ghost" shape="circle" @click="deleteService(svc)">
                                 Delete This Service
                             </Button>
                         </Alert>

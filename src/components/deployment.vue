@@ -1,19 +1,61 @@
 <template>
     <Row>
-        <Col span="16" offset="4">
+        <Col span="18" offset="3">
             <Collapse v-if="deployments" accordion>
                 <Panel v-for="dep in deployments" :key="dep.name">
                     {{dep.name}}
                     <div slot="content">
-                        <Alert>This app contains {{dep.containers.length}} containers:</Alert>
+                        <Alert>This app contains {{dep.pods.length}} pods:</Alert>
                         <Collapse accordion>
-                            <Panel v-for="c in dep.containers" :key="c.name">
-                                {{c.name}}
-                                <Alert type="warning" slot="content">{{c.image}}</Alert>
+                            <Panel v-for="p in dep.pods" :key="p.name">
+                                {{p.name}}
+                                <span style="float: right; margin-right: 20px;">
+                                    {{p.ip}}
+                                </span>
+                                <div slot="content">
+                                    <Alert>This pod contains {{p.containers.length}} containers:</Alert>
+                                    <Collapse accordion>
+                                        <Panel v-for="c in p.containers" :key="c.name">
+                                            {{c.name}}
+                                            <span style="float: right; margin-right: 20px;">
+                                                <Tag color="green" v-if="c.status.running">running</Tag>
+                                                <Tag color="yellow" v-if="c.status.waiting">waiting</Tag>
+                                                <Tag color="red" v-if="c.status.terminated">terminated</Tag>
+                                            </span>
+                                            <div slot="content">
+                                                <Alert>{{c.image}}</Alert>
+                                                <Alert v-if="c.status.running">
+                                                    started at {{moment(c.status.running.started).startOf().fromNow()}}
+                                                </Alert>
+                                                <Alert type="warning" v-if="c.status.waiting && c.status.waiting.reason">
+                                                    {{c.status.waiting.reason}}
+                                                </Alert>
+                                                <Alert type="warning" v-if="c.status.waiting && c.status.waiting.message">
+                                                    {{c.status.waiting.message}}
+                                                </Alert>
+                                                <Alert type="error" v-if="c.status.terminated">
+                                                    started at {{moment(c.status.terminated.started).startOf().fromNow()}}
+                                                </Alert>
+                                                <Alert type="error" v-if="c.status.terminated">
+                                                    exited at {{moment(c.status.terminated.finished).startOf().fromNow()}}
+                                                </Alert>
+                                                <Alert type="error" v-if="c.status.terminated">
+                                                    exit code: {{c.status.terminated.exitCode}}
+                                                </Alert>
+                                                <Alert type="error" v-if="c.status.terminated && c.status.terminated.reason">
+                                                    {{c.status.terminated.reason}}
+                                                </Alert>
+                                                <Alert type="error" v-if="c.status.terminated && c.status.terminated.message">
+                                                    {{c.status.terminated.message}}
+                                                </Alert>
+                                            </div>
+                                        </Panel>
+                                    </Collapse>
+                                </div>
                             </Panel>
                         </Collapse>
                         <Alert type="warning">
-                            <Button type="ghost" shape="circle" style="color: #ff3300;" @click="deleteDeployment(dep)">
+                            <Button type="ghost" shape="circle" @click="deleteDeployment(dep)">
                                 Delete This App
                             </Button>
                         </Alert>
@@ -22,9 +64,12 @@
             </Collapse>
             <Spin size="large" fix v-else></Spin>
         </Col>
-        <Col span="4">
+        <Col span="3">
             <Affix :offset-top="80">
-                <Button v-if="deployments" @click="createDeployment" type="ghost" shape="circle" style="color: #00cc66; float: right;">
+                <Button v-if="deployments"
+                    @click="createDeployment"
+                    type="ghost" shape="circle"
+                    style="color: #00cc66; float: right;">
                     <Icon type="plus-round"></Icon>
                 </Button>
             </Affix>
@@ -33,6 +78,8 @@
 </template>
 
 <script>
+    import moment from 'moment';
+
     export default {
         data: function() {
             return {
@@ -43,10 +90,24 @@
             this.loadDeployments();
         },
         methods: {
+            moment: moment,
             loadDeployments() {
                 this.deployments = null;
                 this.$http.get('users/' + this.$route.params.username + '/deployments').then(response => {
-                    this.deployments = response.data;
+                    let deps = response.data;
+                    for(let d of deps) {
+                        let m = {}
+                        for(let c of d.containers) {
+                            m[c.name] = c;
+                        }
+                        for(let p of d.pods) {
+                            for(let c of p.containers) {
+                                c["image"] = m[c.name].image;
+                                c["volumes"] = m[c.name].volumes;
+                            }
+                        }
+                    }
+                    this.deployments = deps;
                 }, response => {
                     this.$Message.error('Load deployments failed!');
                 });
