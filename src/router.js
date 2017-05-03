@@ -15,6 +15,7 @@ import DelIngress from './components/del-ingress.vue';
 import Volume from './components/volume.vue';
 import NewVolume from './components/new-volume.vue';
 import DelVolume from './components/del-volume.vue';
+import Log from './components/log.vue'
 
 export default new VueRouter({
     routes: [
@@ -98,6 +99,11 @@ export default new VueRouter({
                      path: "volumes/:vname/delete",
                      component: DelVolume,
                  },
+                 {
+                     name: "log",
+                     path: "pods/:pod/containers/:container/logs",
+                     component: Log
+                 }
              ]
          }
     ]

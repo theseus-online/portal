@@ -48,6 +48,9 @@
                                                 <Alert type="error" v-if="c.status.terminated && c.status.terminated.message">
                                                     {{c.status.terminated.message}}
                                                 </Alert>
+                                                <Button type="ghost" shape="circle" @click="checkLogs(p.name, c.name)">
+                                                    Logs
+                                                </Button>
                                             </div>
                                         </Panel>
                                     </Collapse>
@@ -117,6 +120,9 @@
             },
             deleteDeployment(d) {
                 this.$router.push({ name: "del-deployment", params: { depname: d.name }});
+            },
+            checkLogs(pod, container) {
+                this.$router.push({ name: "log", params: { pod: pod, container: container }})
             }
         }
     }
