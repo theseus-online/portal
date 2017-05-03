@@ -7,6 +7,9 @@
                           @on-focus="newbee.name=''" @on-blur="validateAppName(newbee)">
                     </Input>
                 </Form-item>
+                <Form-item label="Replicas">
+                     <Input-number :min="1" :max="3" v-model="newbee.replicas"></Input-number>
+                </Form-item>
                 <Form-item v-for="(c, i) in newbee.containers" :key="i" :label="'Image' + (i + 1)">
                     <Row type="flex" justify="space-between" style="margin-top: 7px; margin-bottom: 7px;">
                         <Col span="10">
@@ -91,6 +94,7 @@
                 newbee: {           // New deployment
                     name: 'deployment-' + uuid(),
                     owner: this.$route.params.username,
+                    replicas: 1,
                     containers: [
                         {
                             name: 'container-' + uuid(),
