@@ -64,6 +64,18 @@
                             </Tooltip>
                         </Col>
                     </Row>
+                    <Row>
+                        <Col span="8">
+                            <Checkbox v-model="c.custom_entry">
+                                Use custom entry
+                            </Checkbox>
+                        </col>
+                        <Col span="16">
+                            <Input v-model="c.entry" v-show="c.custom_entry"
+                                placeholder="Command">
+                            </Input>
+                        </Col>
+                    </Row>
                 </Form-item>
                 <Form-item>
                     <Tooltip content="Add more image" placement="bottom">
@@ -87,6 +99,7 @@
 
 <script>
     import uuid from 'uuid/v4';
+    import stringArgv from 'string-argv';
 
     export default {
         data: function() {
@@ -99,7 +112,9 @@
                         {
                             name: 'container-' + uuid(),
                             image: null,
-                            volumes: []
+                            volumes: [],
+                            custom_entry: false,
+                            entry: null
                         }
                     ]
                 },
@@ -246,6 +261,21 @@
                         });
                         return;
                     }
+                    if(c.custom_entry && c.entry.trim().length > 0) {
+                        if(c.entry.indexOf('\\') > -1) {
+                            this.$Notice.error({
+                                title: 'Error Command',
+                                desc: 'escape character is not support currently, in command: ' + c.entry,
+                                duration: 0
+                            });
+                            return;
+                        }
+                        let a = stringArgv(c.entry);
+                        c.command = a[0];
+                        c.args = a.splice(1);
+                    }
+                    delete c.custom_entry;
+                    delete c.entry;
                 }
 
                 this.$http.post('users/' + this.$route.params.username + '/deployments', this.newbee).then(response => {

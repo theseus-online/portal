@@ -11,6 +11,7 @@
   "dependencies": {
     "iview": "^2.0.0-rc.8",
     "moment": "^2.18.1",
+    "string-argv": "0.0.2",
     "uuid": "^3.0.1",
     "vue": "^2.2.6",
     "vue-resource": "^1.2.1",
