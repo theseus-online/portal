@@ -2,10 +2,10 @@
     <div>
         <Row style="margin-top: 25px;">
             <Col span="16" offset="4">
-                <Steps :current="1">
+                <Steps :current="2">
                     <Step title="preview" content="2017/4/21 basic concept"></Step>
                     <Step title="alpha" content="2017/4/30 secure"></Step>
-                    <Step title="beta" content="2017/5/20 network isolation & custom command"></Step>
+                    <Step title="beta" content="2017/5/06 network isolation & custom command"></Step>
                     <Step title="release" content="2017/7/20 more feature..."></Step>
                 </Steps>
             </Col>

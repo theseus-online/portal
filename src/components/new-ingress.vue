@@ -8,7 +8,9 @@
                     </Input>
                 </Form-item>
                 <Form-item label="Domain">
-                    <Input v-model="newbee.host" placeholder="Your Site Domain"></Input>
+                    <Input v-model="newbee.host" placeholder="Your Site Domain"
+                        @on-focus="newbee.host=''" @on-blur="validateIngressHost(newbee)">
+                    </Input>
                 </Form-item>
                 <Form-item label="Secure">
                     <i-switch v-model="newbee.secure">
@@ -55,13 +57,14 @@
                 newbee: {           // New deployment
                     name: 'ingress-' + uuid(),
                     owner: this.$route.params.username,
-                    host: null,
+                    host: uuid().slice(24) + '.theseus.online',
                     secure: false,
                     serviceName: '',
                     servicePort: ''
                 },
                 services: [],
-                ingresses: []
+                myIngresses: [],
+                allIngresses: []
             }
         },
         mounted: function() {
@@ -71,7 +74,10 @@
                 this.$Message.error('Load services failed!');
             });
             this.$http.get('users/' + this.$route.params.username + '/ingresses').then(response => {
-                this.ingresses = response.data;
+                this.myIngresses = response.data;
+            });
+            this.$http.get('ingresses').then(response => {
+                this.allIngresses = response.data;
             });
         },
         computed: {
@@ -88,9 +94,6 @@
                 return [];
             },
             commitable() {
-                if(!this.newbee.host) {
-                    return false;
-                }
                 if(!this.newbee.serviceName) {
                     return false;
                 }
@@ -106,7 +109,7 @@
                 if(!ing.name) {
                     ing.name = name;
                 }
-                for(let i of this.ingresses) {
+                for(let i of this.myIngresses) {
                     if(i.name == ing.name) {
                         this.$Notice.warning({
                             title: 'Conflict Ingress Name',
@@ -115,6 +118,31 @@
                         });
                         ing.name = name;
                     }
+                }
+            },
+            validateIngressHost(ing) {
+                let host = uuid().slice(24)  + '.theseus.online';
+                if(!ing.host) {
+                    ing.host = host;
+                }
+                for(let i of this.allIngresses) {
+                    if(i.host == ing.host) {
+                        this.$Notice.warning({
+                            title: 'Conflict Host Name',
+                            desc: 'host name ' + ing.host + ' conflict with existed host, it was reset to ' + host,
+                            duration: 0
+                        });
+                        ing.host = host;
+                    }
+                }
+                let reservePrefix = ing.host.match(/^(.*)\.?theseus\.online$/)
+                if(reservePrefix && reservePrefix[1].length < 9) {
+                    this.$Notice.warning({
+                        title: 'Reserved Host Name',
+                        desc: 'host name ' + ing.host + ' was reserved by theseus.online, it was reset to ' + host,
+                        duration: 0
+                    });
+                    ing.host = host;
                 }
             },
             deploy() {
