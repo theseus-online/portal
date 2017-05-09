@@ -51,6 +51,9 @@
                                                 <Button type="ghost" shape="circle" @click="checkLogs(p.name, c.name)">
                                                     Logs
                                                 </Button>
+                                                <Button type="ghost" shape="circle" @click="openShell(p.name, c.name)">
+                                                    Shell
+                                                </Button>
                                             </div>
                                         </Panel>
                                     </Collapse>
@@ -116,13 +119,18 @@
                 });
             },
             createDeployment() {
-                this.$router.push({ name: "new-deployment" });
+                this.$router.push({ name: 'new-deployment' });
             },
             deleteDeployment(d) {
-                this.$router.push({ name: "del-deployment", params: { depname: d.name }});
+                this.$router.push({ name: 'del-deployment', params: { depname: d.name }});
             },
             checkLogs(pod, container) {
-                this.$router.push({ name: "log", params: { pod: pod, container: container }})
+                this.$router.push({ name: 'log', params: { pod: pod, container: container }})
+            },
+            openShell(pod, container) {
+                window.open('/web-shell/index.html?user=' + this.$route.params.username 
+                           + '&pod=' + pod
+                           + '&container=' + container);
             }
         }
     }
